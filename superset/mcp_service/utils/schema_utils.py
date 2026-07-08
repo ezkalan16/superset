@@ -34,6 +34,34 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
+def filter_fields_by_select_columns(data: dict[str, Any], info: Any) -> dict[str, Any]:
+    """
+    Restrict serialized data to the fields requested via ``select_columns``.
+
+    MCP list/get tools expose a ``select_columns`` option so callers can trim
+    responses to just the fields they care about. The selection is threaded
+    through Pydantic serialization as ``info.context["select_columns"]``. This
+    helper centralizes the ``@model_serializer(mode="wrap")`` filtering logic
+    that would otherwise be duplicated across every ``*Info`` schema.
+
+    Args:
+        data: The already-serialized model data (output of the wrapped
+            serializer).
+        info: The Pydantic ``SerializationInfo`` whose ``context`` may carry a
+            ``select_columns`` iterable.
+
+    Returns:
+        ``data`` filtered to the requested columns when ``select_columns`` is
+        present and non-empty, otherwise ``data`` unchanged.
+    """
+    if info.context and isinstance(info.context, dict):
+        select_columns = info.context.get("select_columns")
+        if select_columns:
+            requested_fields = set(select_columns)
+            return {k: v for k, v in data.items() if k in requested_fields}
+    return data
+
+
 class JSONParseError(ValueError):
     """Raised when JSON parsing fails with helpful context."""
 

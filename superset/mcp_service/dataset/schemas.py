@@ -59,6 +59,7 @@ from superset.mcp_service.utils import (
     sanitize_for_llm_context,
 )
 from superset.mcp_service.utils.response_utils import humanize_timestamp
+from superset.mcp_service.utils.schema_utils import filter_fields_by_select_columns
 from superset.utils import json
 
 
@@ -212,17 +213,7 @@ class DatasetInfo(BaseModel):
         if "schema_name" in data:
             data["schema"] = data.pop("schema_name")
 
-        # Check if we have a context with select_columns
-        if info.context and isinstance(info.context, dict):
-            select_columns = info.context.get("select_columns")
-            if select_columns:
-                requested_fields = set(select_columns)
-
-                # Filter to only requested fields
-                return {k: v for k, v in data.items() if k in requested_fields}
-
-        # No filtering - return all fields
-        return data
+        return filter_fields_by_select_columns(data, info)
 
 
 class DatasetList(BaseModel):

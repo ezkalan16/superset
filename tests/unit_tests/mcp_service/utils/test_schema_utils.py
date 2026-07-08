@@ -23,12 +23,57 @@ import pytest
 from pydantic import BaseModel, ValidationError
 
 from superset.mcp_service.utils.schema_utils import (
+    filter_fields_by_select_columns,
     JSONParseError,
     parse_json_or_list,
     parse_json_or_model,
     parse_json_or_model_list,
     parse_json_or_passthrough,
 )
+
+
+class _Info:
+    """Minimal stand-in for Pydantic's SerializationInfo."""
+
+    def __init__(self, context):
+        self.context = context
+
+
+class TestFilterFieldsBySelectColumns:
+    """Test filter_fields_by_select_columns helper."""
+
+    def test_filters_to_requested_columns(self):
+        """Should keep only fields listed in select_columns."""
+        data = {"id": 1, "name": "x", "extra": "y"}
+        result = filter_fields_by_select_columns(
+            data, _Info({"select_columns": ["id", "name"]})
+        )
+        assert result == {"id": 1, "name": "x"}
+
+    def test_ignores_unknown_requested_columns(self):
+        """Should skip requested columns that are absent from the data."""
+        data = {"id": 1, "name": "x"}
+        result = filter_fields_by_select_columns(
+            data, _Info({"select_columns": ["id", "missing"]})
+        )
+        assert result == {"id": 1}
+
+    def test_empty_select_columns_returns_all(self):
+        """Should return all fields when select_columns is empty."""
+        data = {"id": 1, "name": "x"}
+        assert (
+            filter_fields_by_select_columns(data, _Info({"select_columns": []})) == data
+        )
+
+    def test_no_context_returns_all(self):
+        """Should return all fields when there is no serialization context."""
+        data = {"id": 1, "name": "x"}
+        assert filter_fields_by_select_columns(data, _Info(None)) == data
+
+    def test_non_dict_context_returns_all(self):
+        """Should return all fields when context is not a dict."""
+        data = {"id": 1, "name": "x"}
+        assert filter_fields_by_select_columns(data, _Info("nope")) == data
 
 
 class TestParseJsonOrPassthrough:

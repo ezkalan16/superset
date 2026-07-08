@@ -39,6 +39,7 @@ from superset.mcp_service.constants import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 from superset.mcp_service.system.schemas import PaginationInfo
 from superset.mcp_service.utils import sanitize_for_llm_context
 from superset.mcp_service.utils.schema_utils import (
+    filter_fields_by_select_columns,
     parse_json_or_list,
     parse_json_or_model_list,
 )
@@ -91,12 +92,7 @@ class RoleInfo(BaseModel):
 
     @model_serializer(mode="wrap")
     def _filter_fields_by_context(self, serializer: Any, info: Any) -> dict[str, Any]:
-        data = serializer(self)
-        if info.context and isinstance(info.context, dict):
-            select_columns = info.context.get("select_columns")
-            if select_columns:
-                return {k: v for k, v in data.items() if k in select_columns}
-        return data
+        return filter_fields_by_select_columns(serializer(self), info)
 
 
 class RoleList(BaseModel):

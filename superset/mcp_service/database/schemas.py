@@ -44,6 +44,7 @@ from superset.mcp_service.privacy import filter_user_directory_fields
 from superset.mcp_service.system.schemas import PaginationInfo
 from superset.mcp_service.utils.response_utils import humanize_timestamp
 from superset.mcp_service.utils.schema_utils import (
+    filter_fields_by_select_columns,
     parse_json_or_list,
     parse_json_or_model_list,
 )
@@ -142,15 +143,9 @@ class DatabaseInfo(BaseModel):
         If context contains 'select_columns', only include those fields.
         Otherwise, include all fields (default behavior).
         """
-        data = filter_user_directory_fields(serializer(self))
-
-        if info.context and isinstance(info.context, dict):
-            select_columns = info.context.get("select_columns")
-            if select_columns:
-                requested_fields = set(select_columns)
-                return {k: v for k, v in data.items() if k in requested_fields}
-
-        return data
+        return filter_fields_by_select_columns(
+            filter_user_directory_fields(serializer(self)), info
+        )
 
 
 class DatabaseList(BaseModel):
