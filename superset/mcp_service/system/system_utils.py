@@ -84,6 +84,7 @@ def calculate_dashboard_breakdown(
         )
     except Exception:
         # Return empty breakdown on error
+        logger.exception("Failed to calculate dashboard breakdown")
         return DashboardBreakdown(
             published=0,
             unpublished=0,
@@ -120,6 +121,7 @@ def calculate_database_breakdown(
         return DatabaseBreakdown(by_type=type_counts)
     except Exception:
         # Return empty breakdown on error
+        logger.exception("Failed to calculate database breakdown")
         return DatabaseBreakdown(by_type={})
 
 
@@ -156,6 +158,7 @@ def calculate_instance_summary(
         )
     except Exception:
         # Return empty summary on error
+        logger.exception("Failed to calculate instance summary")
         return InstanceSummary(
             total_dashboards=0,
             total_charts=0,

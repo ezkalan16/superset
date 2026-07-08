@@ -68,6 +68,9 @@ def get_current_user() -> Optional[User]:
 
         return getattr(g, "user", None)
     except Exception:
+        logger.debug(
+            "Could not resolve current user from request context", exc_info=True
+        )
         return None
 
 
