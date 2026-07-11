@@ -115,6 +115,7 @@ from superset.mcp_service.utils.sanitization import (
     sanitize_user_input,
     sanitize_user_input_with_changes,
 )
+from superset.mcp_service.utils.schema_utils import filter_fields_by_select_columns
 from superset.mcp_service.utils.url_utils import get_superset_base_url
 from superset.utils.json import loads as json_loads
 
@@ -518,17 +519,9 @@ class DashboardInfo(BaseModel):
         If context contains 'select_columns', only include those fields.
         Otherwise, include all fields (default behavior).
         """
-        # Get full serialization
-        data = filter_user_directory_fields(serializer(self))
-
-        # Check if we have a context with select_columns
-        if info.context and isinstance(info.context, dict):
-            select_columns = info.context.get("select_columns")
-            if select_columns:
-                # Filter to only requested fields
-                return {k: v for k, v in data.items() if k in select_columns}
-
-        return data
+        return filter_fields_by_select_columns(
+            filter_user_directory_fields(serializer(self)), info
+        )
 
 
 class DashboardList(BaseModel):
