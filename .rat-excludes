@@ -80,6 +80,10 @@ erd.svg
 intro_header.txt
 TODO.md
 
+# dependency upgrade reports
+DEPENDENCY_UPGRADE_REPORT.md
+BEHAVIORAL_IMPACT_REPORT.md
+
 # for LLMs
 llm-context.md
 llms.txt
