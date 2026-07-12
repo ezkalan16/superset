@@ -3516,7 +3516,7 @@ class TestDatabaseApi(SupersetTestCase):
                                 "type": "string",
                                 "x-encrypted-extra": True,
                             },
-                            "query": {"type": "object"},
+                            "query": {"additionalProperties": {}, "type": "object"},
                         },
                         "type": "object",
                     },
@@ -3597,7 +3597,7 @@ class TestDatabaseApi(SupersetTestCase):
                     "name": "Google Sheets",
                     "parameters": {
                         "properties": {
-                            "catalog": {"type": "object"},
+                            "catalog": {"additionalProperties": {}, "type": "object"},
                             "oauth2_client_info": {
                                 "default": {
                                     "authorization_request_uri": "https://accounts.google.com/o/oauth2/v2/auth",

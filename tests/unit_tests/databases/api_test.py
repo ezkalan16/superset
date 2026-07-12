@@ -283,7 +283,7 @@ def test_database_connection(
             },
             "parameters_schema": {
                 "properties": {
-                    "catalog": {"type": "object"},
+                    "catalog": {"additionalProperties": {}, "type": "object"},
                     "oauth2_client_info": {
                         "default": {
                             "authorization_request_uri": "https://accounts.google.com/o/oauth2/v2/auth",
